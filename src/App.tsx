@@ -1,9 +1,20 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import logo from './logo.svg'
 import { Counter } from './features/counter/Counter'
 import './App.css'
+import { initGoogleAuth, fetchRealTimeData } from './utils/google'
 
 function App () {
+  useEffect(() => {
+    initGoogleAuth().then(isLoggedIn => {
+      if (!isLoggedIn) {
+        const auth2 = (window as any).gapi.auth2.getAuthInstance().signIn()
+        return
+      }
+      fetchRealTimeData().then((rs: any) => console.log({ rs }))
+    })
+  }, [])
+
   return (
     <div className='App'>
       <header className='App-header'>
