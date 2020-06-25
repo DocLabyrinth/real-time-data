@@ -1,7 +1,10 @@
 import { GOOGLE_CLIENT_ID, GOOGLE_API_KEY, GOOGLE_VIEW_ID } from '../constants'
+import { GraphData } from '../types'
 
-export const isUserSignedIn = () =>
-  (window as any).gapi.auth2.getAuthInstance().isSignedIn.get()
+export const isUserSignedIn = () => {
+  if (!(window as any).gapi) return false
+  return (window as any).gapi.auth2.getAuthInstance().isSignedIn.get()
+}
 
 const injectGoogleTag = (id: string, documentRoot: Document) =>
   new Promise((resolve, _) => {
@@ -48,12 +51,97 @@ export const initGoogleAuth: () => Promise<boolean> = async () => {
   })
 }
 
-export const fetchRealTimeData = () => {
+// {
+//     "kind": "analytics#realtimeData",
+//     "id": "https://www.googleapis.com/analytics/v3/data/realtime?ids=ga:174135385&dimensions=rt:country,rt:browser&metrics=rt:activeUsers",
+//     "query": {
+//       "ids": "ga:174135385",
+//       "dimensions": "rt:country,rt:browser",
+//       "metrics": [
+//         "rt:activeUsers"
+//       ],
+//       "max-results": 1000
+//     },
+//     "totalResults": 1,
+//     "selfLink": "https://www.googleapis.com/analytics/v3/data/realtime?ids=ga:174135385&dimensions=rt:country,rt:browser&metrics=rt:activeUsers",
+//     "profileInfo": {
+//       "profileId": "174135385",
+//       "accountId": "118132167",
+//       "webPropertyId": "UA-118132167-1",
+//       "internalWebPropertyId": "175044688",
+//       "profileName": "All Web Site Data",
+//       "tableId": "realtime:174135385"
+//     },
+//     "columnHeaders": [
+//       {
+//         "name": "rt:country",
+//         "columnType": "DIMENSION",
+//         "dataType": "STRING"
+//       },
+//       {
+//         "name": "rt:browser",
+//         "columnType": "DIMENSION",
+//         "dataType": "STRING"
+//       },
+//       {
+//         "name": "rt:activeUsers",
+//         "columnType": "METRIC",
+//         "dataType": "INTEGER"
+//       }
+//     ],
+//     "totalsForAllResults": {
+//       "rt:activeUsers": "1"
+//     },
+//     "rows": [
+//       [
+//         "Germany",
+//         "Chrome",
+//         "1"
+//       ]
+//     ]
+//   }
+
+type CountryObject = {
+  [browser: string]: number | string
+}
+
+export const fetchRealtimeData: () => Promise<GraphData | null> = async () => {
   if (!isUserSignedIn()) {
     throw new Error('Not authorized, cannot request data')
   }
 
-  return (window as any).gapi.client.request({
-    path: `https://www.googleapis.com/analytics/v3/data/realtime?ids=ga:${GOOGLE_VIEW_ID}&metrics=rt:activeUsers&dimensions=rt:country,rt:city,rt:browser`
+  const response = await (window as any).gapi.client.request({
+    path: `https://www.googleapis.com/analytics/v3/data/realtime?ids=ga:${GOOGLE_VIEW_ID}&metrics=rt:activeUsers&dimensions=rt:country,rt:browser`
   })
+
+  if (!response.result.rows) {
+    console.log('No active users')
+    return null
+  }
+
+  const countryIndex = response.result.rows.reduce(
+    (acc: any, item: any) => {
+      const [country, browser, totalStr]: Array<string> = item
+      const total = parseInt(totalStr, 10)
+
+      // record the total for this browser/country pair
+      if (!acc.countries[country]) acc.countries[country] = {}
+      acc.countries[country][browser] = total
+
+      // add this browser to the set of keys so we can pass
+      // the values to d3 to create the graph later
+      acc.browserSet.add(browser)
+
+      return acc
+    },
+    { countries: {}, browserSet: new Set() }
+  )
+
+  return {
+    keys: Array.from(countryIndex.browserSet),
+    data: Object.keys(countryIndex.countries).map(countryKey => ({
+      country: countryKey,
+      ...countryIndex.countries[countryKey]
+    }))
+  }
 }
