@@ -4,6 +4,9 @@ import React, { useEffect } from 'react'
 import BarChart from './components/BarChart'
 import { initGoogleAuth, fetchRealtimeData } from './utils/google'
 import Header from './components/Header'
+import Link from './components/Link'
+
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
 function App () {
   useEffect(() => {
@@ -25,34 +28,53 @@ function App () {
         }}
       >
         <Header />
-        <div
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap'
-          }}
-        >
-          <aside
+
+        <Router>
+          <div
             sx={{
-              flexGrow: 1,
-              flexBasis: 'sidebar',
-              bg: 'primary'
+              display: 'flex',
+              flexWrap: 'wrap'
             }}
           >
-            <Box p={3}>Sidebar</Box>
-          </aside>
-          <main
-            sx={{
-              flexGrow: 99999,
-              flexBasis: 0,
-              minWidth: 320
-            }}
-          >
-            <Box p={4}>
-              <h1>Main</h1>
-              <BarChart />
-            </Box>
-          </main>
-        </div>
+            <aside
+              sx={{
+                flexGrow: 1,
+                flexBasis: 'sidebar'
+              }}
+            >
+              <Box p={2}>
+                <Link to='/'>Home</Link>
+                <Link to='/active-users/country-browser'>
+                  Active Users (Country/Browser)
+                </Link>
+                <Link to='/active-users/something-else'>
+                  Active Users (Other)
+                </Link>
+              </Box>
+            </aside>
+            <main
+              sx={{
+                flexGrow: 99999,
+                flexBasis: 0,
+                minWidth: 320
+              }}
+            >
+              <Box p={2}>
+                <Switch>
+                  <Route exact path='/'>
+                    <BarChart />
+                  </Route>
+                  <Route path='/active-users/country-browser'>
+                    <BarChart />
+                  </Route>
+                  <Route path='/active-users/something-else'>
+                    <h2>TODO</h2>
+                  </Route>
+                </Switch>
+              </Box>
+            </main>
+          </div>
+        </Router>
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { ResponsiveBar } from '@nivo/bar'
+import { Heading } from 'theme-ui'
 import { GraphData } from '../types'
 import { makePoller } from '../utils/network'
 import { selectData, fetchData } from '../slices/realtimeDataSlice'
@@ -27,28 +28,6 @@ const MyResponsiveBar = () => {
 
     dataPoller()
 
-    // let pollTimeout
-
-    // const pollForData = () => {
-    //   if (!isPolling) {
-    //     return
-    //   }
-    //   fetchRealtimeData()
-    //     .then(newData => {
-    //       console.log({ newData })
-    //       setData(newData)
-    //     })
-    //     .then(() => {
-    //       pollTimeout = setTimeout(pollForData, 5000)
-    //     })
-    //     .catch(err => {
-    //       console.log('Polling request failed', err)
-    //       pollTimeout = setTimeout(pollForData, 5000)
-    //     })
-    // }
-
-    // pollTimeout = setTimeout(pollForData, 5000)
-
     return () => {
       stopPolling = true
     }
@@ -56,7 +35,9 @@ const MyResponsiveBar = () => {
 
   return (
     <div style={{ height: 500 }}>
+      <Heading>Active Users by Country / Browser</Heading>
       <ResponsiveBar
+        layout='horizontal'
         data={graphData.data}
         keys={graphData.keys}
         indexBy='country'
@@ -104,7 +85,7 @@ const MyResponsiveBar = () => {
           tickSize: 5,
           tickPadding: 5,
           tickRotation: 0,
-          legend: 'Country',
+          legend: 'Total Active Users',
           legendPosition: 'middle',
           legendOffset: 32
         }}
@@ -112,7 +93,6 @@ const MyResponsiveBar = () => {
           tickSize: 5,
           tickPadding: 5,
           tickRotation: 0,
-          legend: 'Total Active Users',
           legendPosition: 'middle',
           legendOffset: -40
         }}
