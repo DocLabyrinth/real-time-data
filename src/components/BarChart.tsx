@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { ResponsiveBar } from '@nivo/bar'
 import { Heading } from 'theme-ui'
-import { GraphData } from '../types'
 import { makePoller } from '../utils/network'
-import { selectData, fetchData } from '../slices/realtimeDataSlice'
+import {
+  selectBrowserData,
+  fetchBrowserData,
+  clearBrowserData
+} from '../slices/realtimeDataSlice'
 
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 and
@@ -13,14 +16,14 @@ import { selectData, fetchData } from '../slices/realtimeDataSlice'
 // you'll often use just a few of them.
 
 const MyResponsiveBar = () => {
-  const graphData = useSelector(selectData)
+  const graphData = useSelector(selectBrowserData)
   const dispatch = useDispatch()
 
   useEffect(() => {
     let stopPolling = false
     const dataPoller = makePoller(
       () => {
-        dispatch(fetchData())
+        dispatch(fetchBrowserData())
       },
       () => !stopPolling,
       5000
@@ -30,12 +33,16 @@ const MyResponsiveBar = () => {
 
     return () => {
       stopPolling = true
+      dispatch(clearBrowserData)
     }
   }, [])
 
   return (
     <div style={{ height: 500 }}>
       <Heading>Active Users by Country / Browser</Heading>
+      {graphData.data.length < 1 && (
+        <h5>There are currently no active users</h5>
+      )}
       <ResponsiveBar
         layout='horizontal'
         data={graphData.data}

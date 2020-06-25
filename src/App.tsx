@@ -2,7 +2,8 @@
 import { jsx, Box } from 'theme-ui'
 import React, { useEffect } from 'react'
 import BarChart from './components/BarChart'
-import { initGoogleAuth, fetchRealtimeData } from './utils/google'
+import Sunburst from './components/Sunburst'
+import { initGoogleAuth, fetchUserBrowserData } from './utils/google'
 import Header from './components/Header'
 import Link from './components/Link'
 
@@ -28,7 +29,6 @@ function App () {
         }}
       >
         <Header />
-
         <Router>
           <div
             sx={{
@@ -47,8 +47,8 @@ function App () {
                 <Link to='/active-users/country-browser'>
                   Active Users (Country/Browser)
                 </Link>
-                <Link to='/active-users/something-else'>
-                  Active Users (Other)
+                <Link to='/active-users/browser-device'>
+                  Active Users (Browser/Device)
                 </Link>
               </Box>
             </aside>
@@ -67,8 +67,8 @@ function App () {
                   <Route path='/active-users/country-browser'>
                     <BarChart />
                   </Route>
-                  <Route path='/active-users/something-else'>
-                    <h2>TODO</h2>
+                  <Route path='/active-users/browser-device'>
+                    <Sunburst />
                   </Route>
                 </Switch>
               </Box>

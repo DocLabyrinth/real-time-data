@@ -1,53 +1,78 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { AppThunk, RootState } from '../app/store'
-import { fetchRealtimeData } from '../utils/google'
-import { GraphData } from '../types'
+import { fetchUserBrowserData, fetchUserDeviceData } from '../utils/google'
+import { BarGraphData, SunburstData } from '../types'
 
 interface RealtimeState {
-  data: GraphData
+  userBrowserData: BarGraphData
+  userDeviceData: SunburstData
 }
 
 const initialState: RealtimeState = {
-  data: { keys: [], data: [] }
+  userBrowserData: { keys: [], data: [] },
+  userDeviceData: { name: '', children: [] }
 }
 
 export const realtimeDataSlice = createSlice({
   name: 'realtimeData',
   initialState,
   reducers: {
-    updateData: (state, action: PayloadAction<GraphData>) => {
-      state.data = action.payload
+    updateBrowserData: (state, action: PayloadAction<BarGraphData>) => {
+      state.userBrowserData = action.payload
+    },
+    clearBrowserData: state => {
+      state.userBrowserData = initialState.userBrowserData
+    },
+    updateDeviceData: (state, action: PayloadAction<SunburstData>) => {
+      state.userDeviceData = action.payload
+    },
+    clearDeviceData: state => {
+      state.userDeviceData = initialState.userDeviceData
     }
   }
 })
 
-export const { updateData } = realtimeDataSlice.actions
+export const {
+  updateBrowserData,
+  updateDeviceData,
+  clearBrowserData,
+  clearDeviceData
+} = realtimeDataSlice.actions
 
-// The function below is called a thunk and allows us to perform async logic. It
-// can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
-// will call the thunk with the `dispatch` function as the first argument. Async
-// code can then be executed and other actions can be dispatched
-
-// export const incrementAsync = (amount: number): AppThunk => dispatch => {
-
-export const fetchData = (): AppThunk => dispatch => {
-  fetchRealtimeData()
+export const fetchBrowserData = (): AppThunk => dispatch => {
+  fetchUserBrowserData()
     .then(newData => {
       if (newData === null) {
         // there are currently no active users, clear out the store
-        updateData(initialState.data)
+        updateBrowserData(initialState.userBrowserData)
         return
       }
-      dispatch(updateData(newData))
+      dispatch(updateBrowserData(newData))
     })
     .catch(err => {
       console.log('failed to fetch data', err)
     })
 }
 
-// The function below is called a selector and allows us to select a value from
-// the state. Selectors can also be defined inline where they're used instead of
-// in the slice file. For example: `useSelector((state: RootState) => state.counter.value)`
-export const selectData = (state: RootState) => state.realtimeData.data
+export const selectBrowserData = (state: RootState) =>
+  state.realtimeData.userBrowserData
+
+export const fetchDeviceData = (): AppThunk => dispatch => {
+  fetchUserDeviceData()
+    .then(newData => {
+      if (newData === null) {
+        // there are currently no active users, clear out the store
+        updateDeviceData(initialState.userDeviceData)
+        return
+      }
+      dispatch(updateDeviceData(newData))
+    })
+    .catch(err => {
+      console.log('failed to fetch data', err)
+    })
+}
+
+export const selectDeviceData = (state: RootState) =>
+  state.realtimeData.userDeviceData
 
 export default realtimeDataSlice.reducer

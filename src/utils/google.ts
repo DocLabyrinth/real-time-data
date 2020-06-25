@@ -1,5 +1,5 @@
 import { GOOGLE_CLIENT_ID, GOOGLE_API_KEY, GOOGLE_VIEW_ID } from '../constants'
-import { GraphData } from '../types'
+import { BarGraphData, SunburstData } from '../types'
 
 export const isUserSignedIn = () => {
   if (!(window as any).gapi) return false
@@ -105,7 +105,7 @@ type CountryObject = {
   [browser: string]: number | string
 }
 
-export const fetchRealtimeData: () => Promise<GraphData | null> = async () => {
+export const fetchUserBrowserData: () => Promise<BarGraphData | null> = async () => {
   if (!isUserSignedIn()) {
     throw new Error('Not authorized, cannot request data')
   }
@@ -143,5 +143,54 @@ export const fetchRealtimeData: () => Promise<GraphData | null> = async () => {
       country: countryKey,
       ...countryIndex.countries[countryKey]
     }))
+  }
+}
+
+export const fetchUserDeviceData: () => Promise<SunburstData | null> = async () => {
+  if (!isUserSignedIn()) {
+    throw new Error('Not authorized, cannot request data')
+  }
+
+  const response = await (window as any).gapi.client.request({
+    path: `https://www.googleapis.com/analytics/v3/data/realtime?ids=ga:${GOOGLE_VIEW_ID}&metrics=rt:activeUsers&dimensions=rt:deviceCategory,rt:browser,rt:operatingSystem`
+  })
+
+  if (!response.result.rows) {
+    console.log('No active users')
+    return null
+  }
+
+  const totalUsersStr = response.result.totalsForAllResults['rt:activeUsers']
+  const totalUsers = parseInt(totalUsersStr, 10)
+
+  const userIndex = response.result.rows.reduce((acc: any, item: any) => {
+    const [deviceType, browser, os, numUsersStr]: Array<string> = item
+    const numUsers = parseInt(numUsersStr, 10)
+
+    if (!acc[deviceType]) acc[deviceType] = {}
+    if (!acc[deviceType][browser]) acc[deviceType][browser] = {}
+    acc[deviceType][browser][os] = numUsers
+
+    return acc
+  }, {})
+
+  return {
+    name: 'devices',
+    children: Object.entries(userIndex).map(
+      ([deviceType, deviceObj]: [string, any]) => ({
+        name: deviceType,
+        children: Object.entries(deviceObj).map(
+          ([browser, osObj]: [string, any]) => ({
+            name: browser,
+            children: Object.entries(osObj).map(
+              ([os, numUsers]: [string, any]) => ({
+                name: os,
+                loc: ((numUsers as number) / totalUsers) * 100
+              })
+            )
+          })
+        )
+      })
+    )
   }
 }

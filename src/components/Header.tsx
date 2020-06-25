@@ -9,7 +9,8 @@ const Header = () => (
       alignItems: 'center',
       variant: 'styles.header',
       bg: 'secondary',
-      color: 'white'
+      color: 'white',
+      mb: 3
     }}
   >
     <Box p={3}>

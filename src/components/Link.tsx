@@ -9,7 +9,7 @@ export default (props: any) => (
     style={{ display: 'block' }}
     activeClassName='active'
     sx={{
-      mb: 2,
+      mb: 3,
       color: 'primary',
       '&.active': {
         color: 'primary'
