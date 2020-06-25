@@ -33,7 +33,6 @@ export const { updateData } = realtimeDataSlice.actions
 export const fetchData = (): AppThunk => dispatch => {
   fetchRealtimeData()
     .then(newData => {
-      console.log({ newData })
       if (newData === null) {
         // there are currently no active users, clear out the store
         updateData(initialState.data)

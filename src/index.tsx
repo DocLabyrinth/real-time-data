@@ -1,16 +1,20 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import './index.css'
+import { ThemeProvider } from 'theme-ui'
+import { Provider } from 'react-redux'
+
 import App from './App'
 import { store } from './app/store'
-import { Provider } from 'react-redux'
 import * as serviceWorker from './serviceWorker'
 import { GOOGLE_CLIENT_ID } from './constants'
+import theme from './theme'
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')
