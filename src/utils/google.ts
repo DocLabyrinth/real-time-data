@@ -37,7 +37,8 @@ export const initGoogleAuth: () => Promise<boolean> = async () => {
     scope: 'https://www.googleapis.com/auth/analytics.readonly',
     discoveryDocs: [
       'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'
-    ]
+    ],
+    uxMode: 'redirect'
   })
 
   return new Promise((resolve, _) => {
