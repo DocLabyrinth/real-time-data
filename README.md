@@ -19,3 +19,13 @@ yarn start
 ```
 
 Load up http://localhost:3000. The graphs may take a few seconds to populate. Visit the website for which you've set up the analytics view and credentials and you should see the graph update in real time. Once you close the window the API takes a while to mark you as no longer active, but the graph should eventually update.
+
+
+### Screenshots
+![User/Browser breakdown on desktop](screenshots/browsers-desktop.png)
+
+![User/Browser breakdown on mobile](screenshots/browsers-mobile.png)
+
+![User/Device breakdown on desktop](screenshots/devices-desktop.png)
+
+![User/Device breakdown on mobile](screenshots/devices-mobile.png)
