@@ -1,44 +1,21 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
+## Realtime Dashboard Demo
 
-## Available Scripts
+This is a quick demo of a basic dashboard built using the [Google Realtime Reporting API](https://developers.google.com/analytics/devguides/reporting/realtime/v3/devguide) and [Nivo](https://nivo.rocks/).
 
-In the project directory, you can run:
+### Google Auth
 
-### `yarn start`
+At the time of writing, the real time reporting API is in closed beta. You can get automatically approved, but requests will fail before you are approved. The auth scope is the same as the one for the analytics api for now at least.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The app uses the javascript auth flow for websites, so you'll need to create your own app, credentials and project in google cloud enable the Analytics API on the project and replace the values in [the constants file](src/constants.ts) with the relevant google auth values. The view ID is the ID of the analytics view, which is buried in the Admin section of the Google Analytics control panel. Once that's done you'll need to make sure that http://localhost:3000/ (note the trailing slash) is authorized as a redirect URL for the credentials you created. If all that is in place then the app should be able to authenticate and make requests.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+### Running the app
 
-### `yarn test`
+Check out the repo and run:
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+yarn install
+yarn start
 
-### `yarn build`
+```
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+Load up http://localhost:3000. The graphs may take a few seconds to populate. Visit the website for which you've set up the analytics view and credentials and you should see the graph update in real time. Once you close the window the API takes a while to mark you as no longer active, but the graph should eventually update.
